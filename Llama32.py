@@ -107,9 +107,9 @@ def generate_response(question):
 
         # Decode Output
         generated_text = tokenizer.decode(output_generator.sequences[0], skip_special_tokens=True).strip()
-
+        generated_text=generated_text.split("Answer")[-1]
         # Compute Token Metrics
-        num_tokens = output_generator.sequences.shape[1] - input_ids.shape[1]
+        num_tokens =len(generated_text.split())
         tokens_per_second = round(num_tokens / total_time, 2) if total_time > 0 else "N/A"
 
         return {
