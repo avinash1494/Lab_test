@@ -5,6 +5,10 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
 
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+
 # Specify the directory containing the PDFs
 pdf_directory = './'  # Replace with your actual directory path
 
