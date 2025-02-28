@@ -6,7 +6,7 @@ from langchain.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
 
 # Specify the directory containing the PDFs
-pdf_directory = '/'  # Replace with your actual directory path
+pdf_directory = './'  # Replace with your actual directory path
 
 # Get a list of all PDF files in the directory
 pdf_files = [f for f in os.listdir(pdf_directory) if f.endswith('.pdf')]
