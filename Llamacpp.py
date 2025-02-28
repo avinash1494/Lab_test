@@ -1,73 +1,73 @@
-# import os
-# import time
-# from langchain.document_loaders import PyPDFLoader
-# from langchain.text_splitter import RecursiveCharacterTextSplitter
-# from langchain.vectorstores import FAISS
-# from langchain.embeddings import HuggingFaceEmbeddings
+import os
+import time
+from langchain.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import FAISS
+from langchain.embeddings import HuggingFaceEmbeddings
 
-# # Specify the directory containing the PDFs
-# pdf_directory = '/home/avinash_dataneuron_ai/jupy/jup_notebook/Netapp_vector_store_testong/'  # Replace with your actual directory path
+# Specify the directory containing the PDFs
+pdf_directory = '/'  # Replace with your actual directory path
 
-# # Get a list of all PDF files in the directory
-# pdf_files = [f for f in os.listdir(pdf_directory) if f.endswith('.pdf')]
+# Get a list of all PDF files in the directory
+pdf_files = [f for f in os.listdir(pdf_directory) if f.endswith('.pdf')]
 
-# print("all files:",pdf_files)
-
-
-# # Initialize embedding model once (to avoid loading it multiple times)
-# embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
+print("all files:",pdf_files)
 
 
-# # Start timer for the entire process
-# start_time = time.time()
+# Initialize embedding model once (to avoid loading it multiple times)
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
 
-# total_docs=[]
-# # Loop over all PDF files and process each one
-# for pdf_file in pdf_files:
-#     print(f"Processing file: {pdf_file}")
-#     pdf_start_time = time.time()
-#     # Start timer for the current PDF file
+
+# Start timer for the entire process
+start_time = time.time()
+
+total_docs=[]
+# Loop over all PDF files and process each one
+for pdf_file in pdf_files:
+    print(f"Processing file: {pdf_file}")
+    pdf_start_time = time.time()
+    # Start timer for the current PDF file
     
     
-#     # Step 1: Load the PDF
-#     load_start_time = time.time()
-#     loader = PyPDFLoader(os.path.join(pdf_directory, pdf_file))
-#     pages = loader.load_and_split()
-#     load_end_time = time.time()
-#     print(f"PDF loading and splitting time: {load_end_time - load_start_time:.2f} seconds")
+    # Step 1: Load the PDF
+    load_start_time = time.time()
+    loader = PyPDFLoader(os.path.join(pdf_directory, pdf_file))
+    pages = loader.load_and_split()
+    load_end_time = time.time()
+    print(f"PDF loading and splitting time: {load_end_time - load_start_time:.2f} seconds")
     
-#     # Step 2: Split the text
-#     split_start_time = time.time()
-#     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
-#     splited_docs = text_splitter.split_documents(pages)
-#     total_docs.extend(splited_docs)
-#     split_end_time = time.time()
-#     print(f"Text splitting time: {split_end_time - split_start_time:.2f} seconds")
+    # Step 2: Split the text
+    split_start_time = time.time()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+    splited_docs = text_splitter.split_documents(pages)
+    total_docs.extend(splited_docs)
+    split_end_time = time.time()
+    print(f"Text splitting time: {split_end_time - split_start_time:.2f} seconds")
 
-# print("total docs length:",len(total_docs))
+print("total docs length:",len(total_docs))
 
-# #input()
-# print("pushoing docs to the faiss store started !!!")
-# # Step 3: Generate embeddings
-# embedding_start_time = time.time()
-# db_pdf = FAISS.from_documents(total_docs, embeddings)
-# embedding_end_time = time.time()
-# print(f"Embedding generation time: {embedding_end_time - embedding_start_time:.2f} seconds")
+#input()
+print("pushoing docs to the faiss store started !!!")
+# Step 3: Generate embeddings
+embedding_start_time = time.time()
+db_pdf = FAISS.from_documents(total_docs, embeddings)
+embedding_end_time = time.time()
+print(f"Embedding generation time: {embedding_end_time - embedding_start_time:.2f} seconds")
 
-# # Step 4: Save the vector store
-# save_start_time = time.time()
+# Step 4: Save the vector store
+save_start_time = time.time()
 
-# db_pdf.save_local("second_vector_db")
-# save_end_time = time.time()
-# print(f"Vector store saving time: {save_end_time - save_start_time:.2f} seconds")
+db_pdf.save_local("second_vector_db")
+save_end_time = time.time()
+print(f"Vector store saving time: {save_end_time - save_start_time:.2f} seconds")
 
-# # End timer for the current PDF file
-# pdf_end_time = time.time()
-# print(f"Total processing time for {pdf_file}: {pdf_end_time - pdf_start_time:.2f} seconds\n")
+# End timer for the current PDF file
+pdf_end_time = time.time()
+print(f"Total processing time for {pdf_file}: {pdf_end_time - pdf_start_time:.2f} seconds\n")
 
-# # End timer for the entire process
-# end_time = time.time()
-# print(f"Total elapsed time for all PDFs: {end_time - start_time:.2f} seconds")
+# End timer for the entire process
+end_time = time.time()
+print(f"Total elapsed time for all PDFs: {end_time - start_time:.2f} seconds")
 
 
 
