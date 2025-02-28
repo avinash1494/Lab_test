@@ -6,7 +6,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 
 # === Model Configuration ===
-BASE_MODEL = "meta-llama/Llama-2-13b"
+BASE_MODEL = "meta-llama/Llama-3.2-1B"
 TOKEN_VALUE = "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"
 
 # === Load Tokenizer ===
