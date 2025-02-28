@@ -40,7 +40,7 @@ embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-
 vector_db_path = "second_vector_db"
 vector_db = FAISS.load_local(vector_db_path, embeddings, allow_dangerous_deserialization=True)
 
- === Retrieve Context from FAISS ===
+#=== Retrieve Context from FAISS ===
 def retrieve_context(query, top_k=3):
     """
     Retrieves the most relevant documents from the FAISS vector database.
