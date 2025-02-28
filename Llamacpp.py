@@ -90,7 +90,7 @@ MODEL_BASENAME = "llama-2-13b-chat.ggmlv3.q5_1.bin"
 model_path = hf_hub_download(repo_id=MODEL_NAME_OR_PATH, filename=MODEL_BASENAME)
 
 # GPU and batch configuration (adjust as needed)
-N_GPU_LAYERS = 31  # Use GPU acceleration (-1 for full GPU)
+N_GPU_LAYERS = -1  # Use GPU acceleration (-1 for full GPU)
 N_BATCH = 512  # Adjust batch size based on your system
 
 # === Initialize LLM Model ===
@@ -136,7 +136,7 @@ def augment_prompt(source_knowledge, query):
         end_time = time.time()
 
         # === Token Usage (Estimated) ===
-        num_tokens = len(prompt_template.split())  # Approximate token count
+        num_tokens = len(llm_result.split())  # Approximate token count
 
         # === Collect Performance Metrics ===
         metrics = {
@@ -169,6 +169,7 @@ questions = [
 NEAREST_NEIGHBOR = 5
 
 for query in questions:
+    init_start_time = time.time()
     print("\n" + "="*50)
     print(f"Query: {query}")
     print("vector DB:",vector_db)
@@ -177,13 +178,15 @@ for query in questions:
 
     # Generate response and track performance
     result = augment_prompt(source_knowledge, query)
-
+    init_end_time = time.time()
+    api_elapsed_time=round(init_end_time - init_start_time, 4)
     # Print results
     if result:
         print(f"Response: {result['response']}")
         print(f"Inference Time: {result['inference_time']} seconds")
         print(f"Token Count: {result['token_count']}")
         print(f"Tokens per Second: {result['tokens_per_second']}")
+        print("ealseped time for API call:",api_elapsed_time)
     else:
         print("Failed to generate a response.")
 
