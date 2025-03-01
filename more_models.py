@@ -1,4 +1,6 @@
 
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import re
 import time
 import traceback
@@ -9,8 +11,7 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.llms import LlamaCpp
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 # === Model Configuration ===
 MODEL_NAME_OR_PATH = "TheBloke/Llama-2-13B-chat-GGML"
 MODEL_BASENAME = "llama-2-13b-chat.ggmlv3.q5_1.bin"
