@@ -67,7 +67,7 @@ def generate_response(question):
         ) if context else question
         
         start_time = time.time()
-        pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=400)
+        pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=2000)
         result = pipe(f"<s>[INST] {prompt} [/INST]")
         response = result[0]['generated_text']
         response = re.sub(r'<s>\[INST\].*?\[/INST\]', '', generated_text)
