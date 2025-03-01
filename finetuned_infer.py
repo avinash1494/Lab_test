@@ -85,7 +85,7 @@ def generate_response(question):
             return_full_text=True,  # langchain expects the full text
             task='text-generation',
             # we pass model parameters here too
-            temperature=0.0,  # 'randomness' of outputs, 0.0 is the min and 1.0 the max
+            temperature=0.01,  # 'randomness' of outputs, 0.0 is the min and 1.0 the max
             max_new_tokens=512,  # mex number of tokens to generate in the output
             repetition_penalty=1.1  # without this output begins repeating
         )
