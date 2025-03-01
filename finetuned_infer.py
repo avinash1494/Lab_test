@@ -2,15 +2,17 @@ import os
 import time
 import torch
 import traceback
-import transformers
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, pipeline
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
+from langchain.llms import HuggingFacePipeline
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
 from peft import PeftModel
 
 # === Environment Configuration ===
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-#os.environ["TOKENIZERS_PARALLELISM"] = "true"
+
 
 # === Model Configuration ===
 BASE_MODEL = "meta-llama/Llama-2-13b-hf"
@@ -43,22 +45,6 @@ model = model.merge_and_unload()
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
 vector_db_path = "second_vector_db"
 vector_db = FAISS.load_local(vector_db_path, embeddings, allow_dangerous_deserialization=True)
-from langchain.chains import RetrievalQA
-
-llm = transformers.pipeline(
-            model=model, tokenizer=tokenizer,
-            return_full_text=True,  # langchain expects the full text
-            task='text-generation',
-            # we pass model parameters here too
-            temperature=0.01,  # 'randomness' of outputs, 0.0 is the min and 1.0 the max
-            max_new_tokens=512,  # mex number of tokens to generate in the output
-            repetition_penalty=1.1  # without this output begins repeating
-)
-rag_pipeline = RetrievalQA.from_chain_type(
-    llm=llm, chain_type='stuff',
-    retriever=vector_db.as_retriever()
-)
-     
 
 def retrieve_context(query, top_k=3):
     """Retrieves the most relevant documents from the FAISS vector database."""
@@ -86,25 +72,43 @@ def augment_prompt(source_knowledge, query):
         print(f"Error in augment_prompt: {str(e)}")
         return "[INST] <> We encountered an error. <> [/INST]"
 
+# === Set Up HuggingFacePipeline ===
+hf_pipeline = pipeline(
+    model=model, tokenizer=tokenizer,
+    return_full_text=True,
+    task='text-generation',
+    temperature=0.01,
+    max_new_tokens=512,
+    repetition_penalty=1.1
+)
+
+llm = HuggingFacePipeline(pipeline=hf_pipeline)
+
+# === Define Prompt Template ===
+prompt_template = PromptTemplate(
+    input_variables=["question"],
+    template="You are an AI assistant. Answer the following question based on your knowledge:\n\nQuestion: {question}\nAnswer:"
+)
+
+# === Initialize LLMChain ===
+llm_chain = LLMChain(llm=llm, prompt=prompt_template)
+
 def generate_response(question):
     """Generates a response using the LLM and measures performance metrics."""
     try:
-        #source_knowledge = retrieve_context(question)
-        #full_prompt = augment_prompt(source_knowledge, question)
-        # input_ids = tokenizer(full_prompt, return_tensors="pt").input_ids.to(model.device)
+        source_knowledge = retrieve_context(question)
+        full_prompt = augment_prompt(source_knowledge, question)
         
         # Measure Inference Time
         start_time = time.time()
-        generated_text=rag_pipeline(question)
+        response = llm_chain.run({"question": question})
         total_time = round(time.time() - start_time, 2)
 
-        # # Decode and Compute Token Metrics
-        # generated_text = tokenizer.decode(output_generator.sequences[0], skip_special_tokens=True).strip()
-        num_tokens = len(generated_text)
+        num_tokens = len(tokenizer.encode(response))
         tokens_per_second = round(num_tokens / total_time, 2) if total_time > 0 else "N/A"
 
         return {
-            "response": generated_text,
+            "response": response,
             "inference_time": total_time,
             "tokens_generated": num_tokens,
             "tokens_per_second": tokens_per_second,
