@@ -51,23 +51,22 @@ tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, use_auth_token=TOKEN_VALUE
 
 # === Configure BitsAndBytes for Quantization ===
 bnb_config = BitsAndBytesConfig(
-    load_in_4bit=True,
+    load_in_4bit=True,  # Enable 4-bit quantization
     bnb_4bit_use_double_quant=True,
     bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.bfloat16
+    bnb_4bit_compute_dtype=torch.bfloat16  # Use bfloat16 for better performance
 )
 
-# === Load Base Model ===
+# === Load Base Model on GPU ===
+device = "cuda" if torch.cuda.is_available() else "cpu"  # Ensure CUDA is available
+
 model = AutoModelForCausalLM.from_pretrained(
-    BASE_MODEL, use_auth_token=TOKEN_VALUE,
-    quantization_config=bnb_config,  # Use BitsAndBytes config
-    torch_dtype=torch.float16,
-    device_map="auto"
-)
-
-# Uncomment below lines if using LoRA Adapter
-# model = PeftModel.from_pretrained(model, ADAPTER_PATH)
-# model = model.merge_and_unload()
+    BASE_MODEL, 
+    use_auth_token=TOKEN_VALUE,
+    quantization_config=bnb_config,  # Apply 4-bit quantization
+    torch_dtype=torch.float16,  # Force half-precision
+    device_map="auto"  # Auto-assign to available GPUs
+).to(device)  # Ensure model is on GPU
 
 # === Set Padding ===
 tokenizer.pad_token = tokenizer.eos_token
@@ -75,7 +74,7 @@ tokenizer.padding_side = "left"
 
 # === Tokenize Input ===
 full_prompt = "Explain Global warming"
-input_ids = tokenizer(full_prompt, return_tensors="pt").input_ids  # No need to move to model.device
+input_ids = tokenizer(full_prompt, return_tensors="pt").input_ids.to(device)  # Move input to GPU
 
 # Measure First Token Generation Time
 start_time = time.time()
@@ -83,7 +82,7 @@ start_time = time.time()
 with torch.no_grad():
     output_generator = model.generate(
         input_ids,
-        max_new_tokens=500,  # Safer than max_length
+        max_new_tokens=500,  # Avoid memory overflow
         top_p=0.9,
         temperature=0.3,
         repetition_penalty=1.2,
@@ -97,8 +96,14 @@ total_time = time.time() - start_time  # Total inference time
 # Decode Output
 generated_text = tokenizer.decode(output_generator.sequences[0], skip_special_tokens=True).strip()
 
+# === Calculate TPS (Tokens Per Second) ===
+num_generated_tokens = output_generator.sequences.shape[1] - input_ids.shape[1]  # Total generated tokens
+tps = num_generated_tokens / total_time if total_time > 0 else 0  # Tokens Per Second
+
 # Print Results
 print(f"First token time: {first_token_time:.2f} seconds")
 print(f"Total generation time: {total_time:.2f} seconds")
+print(f"Generated tokens: {num_generated_tokens}")
+print(f"TPS (Tokens Per Second): {tps:.2f}")
 print("Generated text:")
 print(generated_text)
