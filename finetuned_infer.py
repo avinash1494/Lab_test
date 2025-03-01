@@ -9,7 +9,7 @@ import os
 
 # === Environment Configuration ===
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-os.environ["TOKENIZERS_PARALLELISM"] = "true"
+#os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 # === Model Configuration ===
 BASE_MODEL = "meta-llama/Llama-2-13b-hf"
