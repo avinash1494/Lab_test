@@ -8,6 +8,7 @@ from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model
 
 # Restrict CUDA to GPU 0
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 # === Model Configuration ===
 BASE_MODEL = "meta-llama/Llama-2-13b-hf"
