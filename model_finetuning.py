@@ -95,7 +95,7 @@ model = get_peft_model(model, config)
 # === Training Arguments (Optimized for Memory) ===
 peft_training_args = TrainingArguments(
     output_dir="peft_FT_llama2_13b_on_prompt_res_dataset",
-    num_train_epochs=3,
+    num_train_epochs=1,
     per_device_train_batch_size=4,  # Increased batch size from 2 → 4
     per_device_eval_batch_size=2,   # Increased eval batch size from 1 → 2
     gradient_accumulation_steps=8,  # Reduced from 16 → 8 to speed up training
