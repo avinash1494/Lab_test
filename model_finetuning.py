@@ -96,18 +96,19 @@ model = get_peft_model(model, config)
 peft_training_args = TrainingArguments(
     output_dir="peft_FT_llama2_13b_on_prompt_res_dataset",
     num_train_epochs=3,
-    per_device_train_batch_size=2,  # Reduced to avoid OOM
-    per_device_eval_batch_size=1,   # Smaller eval batch
-    gradient_accumulation_steps=16,  # To compensate for small batch size
+    per_device_train_batch_size=4,  # Increased batch size from 2 → 4
+    per_device_eval_batch_size=2,   # Increased eval batch size from 1 → 2
+    gradient_accumulation_steps=8,  # Reduced from 16 → 8 to speed up training
     learning_rate=1e-5,
     weight_decay=0.01,
-    fp16=True,
-    dataloader_num_workers=4,  # Reduce worker threads
+    bf16=True,  # Use bf16 instead of fp16 if supported
+    dataloader_num_workers=8,  # Increased workers for faster data loading
     logging_steps=10,
     evaluation_strategy='epoch',
     report_to="tensorboard",
-    save_steps=100,
+    save_steps=500,  # Reduced frequent saves
 )
+
 
 # Disable Cache for Training
 model.config.use_cache = False
