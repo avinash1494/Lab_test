@@ -66,7 +66,7 @@ model = AutoModelForCausalLM.from_pretrained(
     quantization_config=bnb_config,  # Apply 4-bit quantization
     torch_dtype=torch.float16,  # Force half-precision
     device_map="auto"  # Auto-assign to available GPUs
-).to(device)  # Ensure model is on GPU
+)  # Ensure model is on GPU
 
 # === Set Padding ===
 tokenizer.pad_token = tokenizer.eos_token
@@ -74,7 +74,7 @@ tokenizer.padding_side = "left"
 
 # === Tokenize Input ===
 full_prompt = "Explain Global warming"
-input_ids = tokenizer(full_prompt, return_tensors="pt").input_ids.to(device)  # Move input to GPU
+input_ids = tokenizer(full_prompt, return_tensors="pt").input_ids  # Move input to GPU
 
 # Measure First Token Generation Time
 start_time = time.time()
