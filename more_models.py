@@ -41,15 +41,13 @@ import torch
 import traceback
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from peft import PeftModel
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
 
 # === Model Configuration ===
 BASE_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"
 TOKEN_VALUE = "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"
 
 # === Load Tokenizer ===
-tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, token=TOKEN_VALUE)
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, use_auth_token=TOKEN_VALUE)
 
 # === Configure BitsAndBytes for Quantization ===
 bnb_config = BitsAndBytesConfig(
@@ -61,7 +59,8 @@ bnb_config = BitsAndBytesConfig(
 
 # === Load Base Model ===
 model = AutoModelForCausalLM.from_pretrained(
-    BASE_MODEL, token=TOKEN_VALUE,
+    BASE_MODEL, use_auth_token=TOKEN_VALUE,
+    quantization_config=bnb_config,  # Use BitsAndBytes config
     torch_dtype=torch.float16,
     device_map="auto"
 )
@@ -73,8 +72,10 @@ model = AutoModelForCausalLM.from_pretrained(
 # === Set Padding ===
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "left"
+
+# === Tokenize Input ===
 full_prompt = "Explain Global warming"
-input_ids = tokenizer(full_prompt, return_tensors="pt").input_ids.to(model.device)
+input_ids = tokenizer(full_prompt, return_tensors="pt").input_ids  # No need to move to model.device
 
 # Measure First Token Generation Time
 start_time = time.time()
@@ -82,7 +83,7 @@ start_time = time.time()
 with torch.no_grad():
     output_generator = model.generate(
         input_ids,
-        max_length=1000,
+        max_new_tokens=500,  # Safer than max_length
         top_p=0.9,
         temperature=0.3,
         repetition_penalty=1.2,
@@ -95,3 +96,9 @@ total_time = time.time() - start_time  # Total inference time
 
 # Decode Output
 generated_text = tokenizer.decode(output_generator.sequences[0], skip_special_tokens=True).strip()
+
+# Print Results
+print(f"First token time: {first_token_time:.2f} seconds")
+print(f"Total generation time: {total_time:.2f} seconds")
+print("Generated text:")
+print(generated_text)
