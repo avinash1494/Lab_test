@@ -2,6 +2,7 @@ import os
 import time
 import torch
 import traceback
+import transformers
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
