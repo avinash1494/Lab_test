@@ -4,7 +4,12 @@ import traceback
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
-from peft import get_peft_model, LoraConfig, TaskType
+from peft import (
+    prepare_model_for_kbit_training,
+    get_peft_model,
+    LoraConfig,
+    PeftModel
+)
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
