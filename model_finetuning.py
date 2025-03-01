@@ -1,12 +1,12 @@
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import torch
 import pandas as pd
 from datasets import Dataset
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from transformers import TrainingArguments, Trainer, DataCollatorForLanguageModeling
 from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 # Set PyTorch memory allocation configuration
 #os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 
