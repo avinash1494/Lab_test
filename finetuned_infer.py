@@ -6,6 +6,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from peft import PeftModel
 import os
+import re
 
 # === Environment Configuration ===
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -70,8 +71,8 @@ def generate_response(question):
         pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=2000)
         result = pipe(f"<s>[INST] {prompt} [/INST]")
         response = result[0]['generated_text']
-        response = re.sub(r'<s>\[INST\].*?\[/INST\]', '', generated_text)
-        response = re.sub(r'<s>\[INST\].*?\[/INST\]', '', generated_text, flags=re.DOTALL)
+        response = re.sub(r'<s>\[INST\].*?\[/INST\]', '', response)
+        response = re.sub(r'<s>\[INST\].*?\[/INST\]', '', response, flags=re.DOTALL)
         total_time = time.time() - start_time
 
         # # Extracting only the relevant part of the response
