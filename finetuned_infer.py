@@ -57,7 +57,7 @@ def generate_response(question):
     try:
         source_knowledge = retrieve_context(question)
         context = "\n".join([x.page_content for x in source_knowledge]) if source_knowledge else ""
-        input_text = f"{context}\nQuestion: {question}" if context else question
+        input_text = f"{context}.Answer the question based on the context. aresponse should be clear and short.Dont include unnecessary information other thatn resposne. \nQuestion: {question}" if context else question
         
         start_time = time.time()
         response = llm_pipeline(input_text, max_length=1000, top_p=0.9, temperature=0.3, repetition_penalty=1.2)[0]["generated_text"]
