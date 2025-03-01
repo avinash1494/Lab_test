@@ -55,34 +55,40 @@ def generate_response(question):
         source_knowledge = retrieve_context(question)
         context = "\n".join(source_knowledge) if source_knowledge else ""
 
-        # Improved Prompt Formatting
+        # Improved prompt
         if context:
             prompt = (
-                f"<s>[INST] Given the following context, provide a clear and concise answer to the question.\n\n"
                 f"Context:\n{context}\n\n"
                 f"Question: {question}\n"
-                f"Answer: [/INST]"
+                f"Provide a clear and concise answer based only on the context above."
             )
         else:
-            prompt = f"<s>[INST] Provide a clear and concise answer to the following question.\n\nQuestion: {question}\nAnswer: [/INST]"
+            prompt = f"Question: {question}\nProvide a clear and concise answer."
+
+        print("\n===== Prompt Sent to Model =====")
+        print(prompt)  # Debugging
+
+        # Tokenize input
+        input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(model.device)
+        print("Tokenized Input IDs:", input_ids)
 
         # Generate response
-        input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(model.device)
         start_time = time.time()
-        output_ids = model.generate(input_ids, max_length=500, temperature=0.3, top_p=0.9, repetition_penalty=1.2)
+        output_ids = model.generate(input_ids, max_length=1000, temperature=0.5, top_p=0.95, repetition_penalty=1.1)
         total_time = time.time() - start_time
 
-        # Decode Response
-        response = tokenizer.decode(output_ids[0], skip_special_tokens=True)
-        
-        # Post-processing
-        response = response.split("Answer:")[-1].strip()
+        # Decode output
+        output_text = tokenizer.decode(output_ids[0], skip_special_tokens=True)
+        print("Raw Model Output:\n", output_text)  # Debugging
+
+        # Extract actual answer
+        response = output_text.split("Answer:")[-1].strip()
 
         num_tokens = len(tokenizer.encode(response))
         tokens_per_second = round(num_tokens / total_time, 2) if total_time > 0 else "N/A"
 
         return {
-            "response": response,
+            "response": response if response else "[Empty Response]",  # Debugging for empty response
             "inference_time": round(total_time, 2),
             "tokens_generated": num_tokens,
             "tokens_per_second": tokens_per_second,
@@ -91,25 +97,3 @@ def generate_response(question):
         print("Error in generate_response:", traceback.format_exc())
         return None
 
-# === List of Questions ===
-QUESTIONS = [
-    "Explain SnapMirror",
-    "How does NetApp ONTAP work?",
-    "How are Snapshots useful in real-world applications?",
-    "Explain the Spiral Model",
-    "What is FlexClone?"
-]
-
-# === Run Inference ===
-for i, question in enumerate(QUESTIONS):
-    print("\n" + "=" * 50)
-    print(f"Question {i+1}: {question}")
-
-    result = generate_response(question)
-    if result:
-        print(f"Response: {result['response']}\n")
-        print(f"Inference Time: {result['inference_time']} sec")
-        print(f"Tokens Generated: {result['tokens_generated']}")
-        print(f"Tokens Per Second: {result['tokens_per_second']}")
-
-print("\nInference completed for all topics.")
