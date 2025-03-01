@@ -90,12 +90,15 @@ QUESTIONS = [
 for i, question in enumerate(QUESTIONS):
     print("\n" + "=" * 50)
     print(f"Question {i+1}: {question}")
-    
+    init_start_time = time.time()
     result = generate_response(question)
+    init_end_time = time.time()
+    api_elapsed_time=round(init_end_time - init_start_time, 4)
+
     if result:
         print(f"Response: {result['response']}\n")
         print(f"Inference Time: {result['inference_time']} sec")
         print(f"Tokens Generated: {result['tokens_generated']}")
         print(f"Tokens Per Second: {result['tokens_per_second']}")
-
+        print("ealseped time for API call:",api_elapsed_time)
 print("\nInference completed for all topics.")
