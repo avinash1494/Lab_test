@@ -4,10 +4,14 @@ import traceback
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 # === Model Configuration ===
-BASE_MODEL = "meta-llama/Llama-3.2-1B"
-TOKEN_VALUE = "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"
+BASE_MODEL = "meta-llama/Llama-2-13b-hf"
+ADAPTER_PATH="peft_FT_llama2_13b_on_prompt_res_dataset"
+TOKEN_VALUE = "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"
 
 # === Load Tokenizer ===
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, token=TOKEN_VALUE)
@@ -27,9 +31,9 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map="auto"
 )
 
-# Uncomment below lines if using LoRA Adapter
-# model = PeftModel.from_pretrained(model, ADAPTER_PATH)
-# model = model.merge_and_unload()
+#Uncomment below lines if using LoRA Adapter
+model = PeftModel.from_pretrained(model, ADAPTER_PATH)
+model = model.merge_and_unload()
 
 # === Set Padding ===
 tokenizer.pad_token = tokenizer.eos_token
