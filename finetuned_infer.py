@@ -36,7 +36,7 @@ model = PeftModel.from_pretrained(model, ADAPTER_PATH)
 model = model.merge_and_unload()
 
 # === Create Inference Pipeline ===
-llm_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer, device=0)
+llm_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
 # === Load Vector Database ===
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
