@@ -74,24 +74,25 @@ def generate_response(question):
     try:
         source_knowledge = retrieve_context(question)
         full_prompt = augment_prompt(source_knowledge, question)
-        input_ids = tokenizer(full_prompt, return_tensors="pt").input_ids.to(model.device)
+        # input_ids = tokenizer(full_prompt, return_tensors="pt").input_ids.to(model.device)
         
         # Measure Inference Time
         start_time = time.time()
-        with torch.no_grad():
-            output_generator = model.generate(
-                input_ids,
-                max_length=1000,
-                top_p=0.9,
-                temperature=0.3,
-                repetition_penalty=1.2,
-                return_dict_in_generate=True,
-                output_scores=True
-            )
+        
+        pipeline = transformers.pipeline(
+            model=model, tokenizer=tokenizer,
+            return_full_text=True,  # langchain expects the full text
+            task='text-generation',
+            # we pass model parameters here too
+            temperature=0.0,  # 'randomness' of outputs, 0.0 is the min and 1.0 the max
+            max_new_tokens=512,  # mex number of tokens to generate in the output
+            repetition_penalty=1.1  # without this output begins repeating
+        )
+        generated_text=pipeline(full_prompt)
         total_time = round(time.time() - start_time, 2)
 
-        # Decode and Compute Token Metrics
-        generated_text = tokenizer.decode(output_generator.sequences[0], skip_special_tokens=True).strip()
+        # # Decode and Compute Token Metrics
+        # generated_text = tokenizer.decode(output_generator.sequences[0], skip_special_tokens=True).strip()
         num_tokens = len(tokenizer.encode(generated_text))
         tokens_per_second = round(num_tokens / total_time, 2) if total_time > 0 else "N/A"
 
