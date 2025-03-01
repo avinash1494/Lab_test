@@ -15,24 +15,24 @@ BASE_MODEL = "meta-llama/Llama-2-13b-hf"
 TOKEN_VALUE="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"
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
         
-        #tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
-        # Configure BitsAndBytes
-        bnb_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type='nf4',
-            bnb_4bit_compute_dtype=torch.bfloat16
-        )
-        # Initialize the Llama model
-        model = AutoModelForCausalLM.from_pretrained(
-            BASE_MODEL,use_auth_token=token_value,
-            torch_dtype=torch.float16,
-            device_map="auto",
-            quantization_config=bnb_config
-        )
-        # Set pad_token_id and padding_side
-        tokenizer.pad_token_id = 0  # unk. we want this to be different from the eos token
-        tokenizer.padding_side = "left"
+#tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+# Configure BitsAndBytes
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_quant_type='nf4',
+    bnb_4bit_compute_dtype=torch.bfloat16
+)
+# Initialize the Llama model
+model = AutoModelForCausalLM.from_pretrained(
+    BASE_MODEL,use_auth_token=token_value,
+    torch_dtype=torch.float16,
+    device_map="auto",
+    quantization_config=bnb_config
+)
+# Set pad_token_id and padding_side
+tokenizer.pad_token_id = 0  # unk. we want this to be different from the eos token
+tokenizer.padding_side = "left"
 # Load custom dataset
 file_path1 = "prompts_responses_train.xlsx"
 file_path2 = "prompts_responses_test.xlsx"
