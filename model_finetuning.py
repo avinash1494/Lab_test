@@ -1,5 +1,4 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import torch
 import pandas as pd
 from datasets import Dataset
@@ -7,138 +6,113 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from transformers import TrainingArguments, Trainer, DataCollatorForLanguageModeling
 from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model
 
-# Set PyTorch memory allocation configuration
-#os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+# Restrict CUDA to GPU 0
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-# Model and tokenizer setup
+# === Model Configuration ===
 BASE_MODEL = "meta-llama/Llama-2-13b-hf"
-TOKEN_VALUE="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"
-tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
-        
-#tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
-# Configure BitsAndBytes
+TOKEN_VALUE = "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"
+
+# === Load Tokenizer ===
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, token=TOKEN_VALUE)
+
+# === Configure BitsAndBytes for Quantization ===
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_use_double_quant=True,
-    bnb_4bit_quant_type='nf4',
-    bnb_4bit_compute_dtype=torch.bfloat16
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16  # bfloat16 for efficiency
 )
-# Initialize the Llama model
+
+# === Load Model with Quantization ===
 model = AutoModelForCausalLM.from_pretrained(
-    BASE_MODEL,use_auth_token=token_value,
-    torch_dtype=torch.float16,
-    device_map="auto",
+    BASE_MODEL, token=TOKEN_VALUE,
+    device_map="auto",  # Auto assigns to available GPUs
     quantization_config=bnb_config
 )
-# Set pad_token_id and padding_side
-tokenizer.pad_token_id = 0  # unk. we want this to be different from the eos token
+
+# === Set Padding Token ===
+tokenizer.pad_token_id = 0  # Set padding token to unk token
 tokenizer.padding_side = "left"
-# Load custom dataset
+
+# === Load Custom Dataset ===
 file_path1 = "prompts_responses_train.xlsx"
 file_path2 = "prompts_responses_test.xlsx"
 df1 = pd.read_excel(file_path1)
 df2 = pd.read_excel(file_path2)
 
 df = pd.concat([df1, df2], ignore_index=True)
-print(df.shape)
-
-# Convert to HuggingFace Dataset
 dataset = Dataset.from_pandas(df)
 
+# === Tokenization Function ===
 def tokenize_inputs(examples):
-    input_texts = []
-    target_texts = []
-    
-    for doc, prompt, answer in zip(examples['sourceDocuments'], examples['prompt'], examples['answer']):
-        input_text = f"{doc}\n{prompt}"
-        input_texts.append(input_text)
-        target_texts.append(answer)
-    
-    # Reduce max_length to save memory
+    input_texts = [f"{doc}\n{prompt}" for doc, prompt in zip(examples['sourceDocuments'], examples['prompt'])]
+    target_texts = [answer for answer in examples['answer']]
+
     model_inputs = tokenizer(
-        input_texts,
-        padding="max_length",
-        truncation=True,
-        max_length=256,  # Reduced from 512
-        return_tensors=None
+        input_texts, padding="max_length", truncation=True, max_length=256, return_tensors=None
     )
-    
     target_tokens = tokenizer(
-        target_texts,
-        padding="max_length",
-        truncation=True,
-        max_length=256,  # Reduced from 512
-        return_tensors=None
+        target_texts, padding="max_length", truncation=True, max_length=256, return_tensors=None
     )
-    
+
     model_inputs['labels'] = target_tokens['input_ids']
     model_inputs['labels_attention_mask'] = target_tokens['attention_mask']
     
     return model_inputs
 
-# Tokenize datasets with smaller batch size
+# === Tokenize Dataset ===
 tokenized_datasets = dataset.map(
-    tokenize_inputs,
-    batched=True,
-    batch_size=4,  # Reduced from 8
-    remove_columns=dataset.column_names,
-    desc="Tokenizing datasets"
+    tokenize_inputs, batched=True, batch_size=2, remove_columns=dataset.column_names, desc="Tokenizing datasets"
 )
 
-# Split dataset
+# === Split Dataset ===
 train_test_split = tokenized_datasets.train_test_split(test_size=0.2, shuffle=True, seed=42)
-train_subset = train_test_split['train']
-eval_subset = train_test_split['test']
+train_subset, eval_subset = train_test_split['train'], train_test_split['test']
 
-print(f"Length of train dataset: {(train_subset.shape)}")
-print(f"Length of eval dataset: {(eval_subset.shape)}")
+print(f"Train dataset size: {len(train_subset)}")
+print(f"Eval dataset size: {len(eval_subset)}")
 
-# Data collator
-data_collator = DataCollatorForLanguageModeling(
-    tokenizer=tokenizer,
-    mlm=False
-)
+# === Data Collator ===
+data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
+# === LORA Configuration ===
 LORA_R = 4
 LORA_ALPHA = 16
 LORA_DROPOUT = 0.05
 LORA_TARGET_MODULES = ["q_proj", "v_proj"]
-# Prepare the model for K-Bit training
+
+# Enable Gradient Checkpointing **Before PEFT**
 model.gradient_checkpointing_enable()
 model = prepare_model_for_kbit_training(model)
-# Configure the Lora model
+
 config = LoraConfig(
-    r=LORA_R,
-    lora_alpha=LORA_ALPHA,
-    target_modules=LORA_TARGET_MODULES,
-    lora_dropout=LORA_DROPOUT,
-    bias="none",
-    task_type="CAUSAL_LM",
+    r=LORA_R, lora_alpha=LORA_ALPHA, lora_dropout=LORA_DROPOUT,
+    target_modules=LORA_TARGET_MODULES, bias="none", task_type="CAUSAL_LM"
 )
 model = get_peft_model(model, config)
 
-# Memory optimized training arguments
+# === Training Arguments (Optimized for Memory) ===
 peft_training_args = TrainingArguments(
     output_dir="peft_FT_llama2_13b_on_prompt_res_dataset",
-    num_train_epochs=5,
-    per_device_train_batch_size=16,  # Reduced from 16
-    #per_device_eval_batch_size=1,   # Added explicit eval batch size
-    gradient_accumulation_steps=4,  # Added gradient accumulation
+    num_train_epochs=3,
+    per_device_train_batch_size=2,  # Reduced to avoid OOM
+    per_device_eval_batch_size=1,   # Smaller eval batch
+    gradient_accumulation_steps=16,  # To compensate for small batch size
     learning_rate=1e-5,
     weight_decay=0.01,
     fp16=True,
-    dataloader_num_workers=8,  # Reduced from 8
+    dataloader_num_workers=4,  # Reduce worker threads
     logging_steps=10,
     evaluation_strategy='epoch',
     report_to="tensorboard",
     save_steps=100,
-    # Memory optimization settings
-    gradient_checkpointing=True
 )
 
+# Disable Cache for Training
 model.config.use_cache = False
 
-# Trainer setup
+# === Trainer ===
 peft_trainer = Trainer(
     model=model,
     args=peft_training_args,
@@ -147,11 +121,11 @@ peft_trainer = Trainer(
     data_collator=data_collator,
 )
 
-# Train with automatic mixed precision
+# === Train Model ===
 with torch.cuda.amp.autocast():
     peft_trainer.train()
 
-# Save the fine-tuned model and tokenizer
+# === Save Model ===
 output_dir = "peft_FT_llama2_13b_on_prompt_res_dataset"
 model.save_pretrained(output_dir)
 tokenizer.save_pretrained(output_dir)
