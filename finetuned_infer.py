@@ -97,3 +97,25 @@ def generate_response(question):
         print("Error in generate_response:", traceback.format_exc())
         return None
 
+# === List of Questions ===
+QUESTIONS = [
+    "Explain SnapMirror",
+    "How does NetApp ONTAP work?",
+    "How are Snapshots useful in real-world applications?",
+    "Explain the Spiral Model",
+    "What is FlexClone?"
+]
+
+# === Run Inference ===
+for i, question in enumerate(QUESTIONS):
+    print("\n" + "=" * 50)
+    print(f"Question {i+1}: {question}")
+
+    result = generate_response(question)
+    if result:
+        print(f"Response: {result['response']}\n")
+        print(f"Inference Time: {result['inference_time']} sec")
+        print(f"Tokens Generated: {result['tokens_generated']}")
+        print(f"Tokens Per Second: {result['tokens_per_second']}")
+
+print("\nInference completed for all topics.")
