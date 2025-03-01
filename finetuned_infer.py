@@ -62,6 +62,7 @@ def generate_response(question):
         start_time = time.time()
         response = llm_pipeline(input_text, max_length=1000, top_p=0.9, temperature=0.3, repetition_penalty=1.2)[0]["generated_text"]
         total_time = time.time() - start_time
+        response=response.split("Answer:")[-1]
         print("response:",response)
         num_tokens = len(tokenizer.encode(response))
         tokens_per_second = round(num_tokens / total_time, 2) if total_time > 0 else "N/A"
