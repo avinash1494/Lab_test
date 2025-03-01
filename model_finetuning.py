@@ -12,6 +12,7 @@ from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model
 
 # Model and tokenizer setup
 model_id = "meta-llama/Llama-2-13b-hf"
+hf_token="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"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 
 # Set padding token to eos_token
