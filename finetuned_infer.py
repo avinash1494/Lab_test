@@ -1,16 +1,14 @@
 import time
 import torch
 import traceback
-from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from peft import PeftModel
 import os
-import re
 
 # === Environment Configuration ===
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-#os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 # === Model Configuration ===
 BASE_MODEL = "meta-llama/Llama-2-13b-hf"
@@ -35,9 +33,7 @@ model = AutoModelForCausalLM.from_pretrained(
 
 model = PeftModel.from_pretrained(model, ADAPTER_PATH)
 model = model.merge_and_unload()
-
-# === Create Inference Pipeline ===
-#llm_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
+model.eval()
 
 # === Load Vector Database ===
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
@@ -48,39 +44,43 @@ vector_db = FAISS.load_local(vector_db_path, embeddings, allow_dangerous_deseria
 def retrieve_context(query, top_k=3):
     try:
         retrieved_docs = vector_db.similarity_search(query, top_k)
-        return retrieved_docs if retrieved_docs else []
+        return [doc.page_content for doc in retrieved_docs] if retrieved_docs else []
     except Exception as e:
         print(f"Error retrieving context: {str(e)}")
         return []
 
-# === Generate Response Using Pipeline ===
+# === Generate Response ===
 def generate_response(question):
     try:
         source_knowledge = retrieve_context(question)
-        context = "\n".join([x.page_content for x in source_knowledge]) if source_knowledge else ""
-        
-        # Improved prompt structure
-        prompt = (
-            f"Context:\n{context}\n\n"
-            f"You are an AI assistant. Answer the question clearly and concisely based only on the given context.\n"
-            f"Question: {question}\n"
-            f"Answer: "
-        ) if context else question
-        
+        context = "\n".join(source_knowledge) if source_knowledge else ""
+
+        # Improved Prompt Formatting
+        if context:
+            prompt = (
+                f"<s>[INST] Given the following context, provide a clear and concise answer to the question.\n\n"
+                f"Context:\n{context}\n\n"
+                f"Question: {question}\n"
+                f"Answer: [/INST]"
+            )
+        else:
+            prompt = f"<s>[INST] Provide a clear and concise answer to the following question.\n\nQuestion: {question}\nAnswer: [/INST]"
+
+        # Generate response
+        input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(model.device)
         start_time = time.time()
-        pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=2000)
-        result = pipe(f"<s>[INST] {prompt} [/INST]")
-        response = result[0]['generated_text']
-        response = re.sub(r'<s>\[INST\].*?\[/INST\]', '', response)
-        response = re.sub(r'<s>\[INST\].*?\[/INST\]', '', response, flags=re.DOTALL)
+        output_ids = model.generate(input_ids, max_length=500, temperature=0.3, top_p=0.9, repetition_penalty=1.2)
         total_time = time.time() - start_time
 
-        # # Extracting only the relevant part of the response
-        # response = response.split("Answer:")[-1].strip()
+        # Decode Response
+        response = tokenizer.decode(output_ids[0], skip_special_tokens=True)
         
+        # Post-processing
+        response = response.split("Answer:")[-1].strip()
+
         num_tokens = len(tokenizer.encode(response))
         tokens_per_second = round(num_tokens / total_time, 2) if total_time > 0 else "N/A"
-        
+
         return {
             "response": response,
             "inference_time": round(total_time, 2),
@@ -104,7 +104,7 @@ QUESTIONS = [
 for i, question in enumerate(QUESTIONS):
     print("\n" + "=" * 50)
     print(f"Question {i+1}: {question}")
-    
+
     result = generate_response(question)
     if result:
         print(f"Response: {result['response']}\n")
