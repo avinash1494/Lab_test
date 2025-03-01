@@ -99,25 +99,22 @@ data_collator = DataCollatorForLanguageModeling(
     mlm=False
 )
 
-# PEFT Configuration
+LORA_R = 4
+LORA_ALPHA = 16
+LORA_DROPOUT = 0.05
+LORA_TARGET_MODULES = ["q_proj", "v_proj"]
+# Prepare the model for K-Bit training
+model.gradient_checkpointing_enable()
+model = prepare_model_for_kbit_training(model)
+# Configure the Lora model
 config = LoraConfig(
-    r=8,
-    lora_alpha=32,
-    target_modules=[
-        "q_proj",
-        "k_proj",
-        "v_proj",
-        "o_proj",
-        "gate_proj",
-        "up_proj",
-        "down_proj",
-        "lm_head",
-    ],
+    r=LORA_R,
+    lora_alpha=LORA_ALPHA,
+    target_modules=LORA_TARGET_MODULES,
+    lora_dropout=LORA_DROPOUT,
     bias="none",
-    lora_dropout=0.05,
     task_type="CAUSAL_LM",
 )
-
 model = get_peft_model(model, config)
 
 # Memory optimized training arguments
