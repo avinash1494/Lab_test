@@ -36,7 +36,7 @@ model = PeftModel.from_pretrained(model, ADAPTER_PATH)
 model = model.merge_and_unload()
 
 # === Create Inference Pipeline ===
-llm_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
+#llm_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
 # === Load Vector Database ===
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
@@ -59,7 +59,7 @@ def generate_response(question):
         context = "\n".join([x.page_content for x in source_knowledge]) if source_knowledge else ""
         
         # Improved prompt structure
-        input_text = (
+        prompt = (
             f"Context:\n{context}\n\n"
             f"You are an AI assistant. Answer the question clearly and concisely based only on the given context.\n"
             f"Question: {question}\n"
@@ -67,11 +67,15 @@ def generate_response(question):
         ) if context else question
         
         start_time = time.time()
-        response = llm_pipeline(input_text, max_length=1000, top_p=0.9, temperature=0.3, repetition_penalty=1.2)[0]["generated_text"]
+        pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=400)
+        result = pipe(f"<s>[INST] {prompt} [/INST]")
+        response = result[0]['generated_text']
+        response = re.sub(r'<s>\[INST\].*?\[/INST\]', '', generated_text)
+        response = re.sub(r'<s>\[INST\].*?\[/INST\]', '', generated_text, flags=re.DOTALL)
         total_time = time.time() - start_time
 
-        # Extracting only the relevant part of the response
-        response = response.split("Answer:")[-1].strip()
+        # # Extracting only the relevant part of the response
+        # response = response.split("Answer:")[-1].strip()
         
         num_tokens = len(tokenizer.encode(response))
         tokens_per_second = round(num_tokens / total_time, 2) if total_time > 0 else "N/A"
