@@ -11,12 +11,12 @@ from langchain.prompts import PromptTemplate
 from peft import PeftModel
 
 # === Environment Configuration ===
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 # === Model Configuration ===
-BASE_MODEL = "meta-llama/Llama-2-13b-hf"
-ADAPTER_PATH = "peft_FT_llama2_13b_on_prompt_res_dataset"
+BASE_MODEL = "meta-llama/Llama-2-70b-hf"
+#ADAPTER_PATH = "peft_FT_llama2_13b_on_prompt_res_dataset"
 TOKEN_VALUE = "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"
 
 # === Load Tokenizer ===
@@ -38,8 +38,8 @@ model = AutoModelForCausalLM.from_pretrained(
     torch_dtype=torch.float16,
     device_map="auto"
 )
-model = PeftModel.from_pretrained(model, ADAPTER_PATH)
-model = model.merge_and_unload()
+#model = PeftModel.from_pretrained(model, ADAPTER_PATH)
+#model = model.merge_and_unload()
 
 # === Load Vector Database ===
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
