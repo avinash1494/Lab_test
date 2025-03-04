@@ -11,7 +11,7 @@ from langchain.prompts import PromptTemplate
 from peft import PeftModel
 
 # === Environment Configuration ===
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 # === Model Configuration ===
