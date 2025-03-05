@@ -99,12 +99,13 @@ def generate_response(question):
     try:
         source_knowledge = retrieve_context(question)
         full_prompt = augment_prompt(source_knowledge, question)
-        
+        print("Got inference Request !!!!!!!!!!")
         # Measure Inference Time
         start_time = time.time()
+        print("start time :",start_time)
         response = llm_chain.run({"question": question})
         total_time = round(time.time() - start_time, 2)
-
+        print("end time :",time.time())
         num_tokens = len(tokenizer.encode(response))
         tokens_per_second = round(num_tokens / total_time, 2) if total_time > 0 else "N/A"
 
