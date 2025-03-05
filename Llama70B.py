@@ -15,7 +15,7 @@ from peft import PeftModel
 
 
 # === Model Configuration ===
-BASE_MODEL = "meta-llama/Llama-2-13b-hf"
+BASE_MODEL = "meta-llama/Llama-2-70b-hf"
 # ADAPTER_PATH = "peft_FT_llama2_13b_on_prompt_res_dataset"
 TOKEN_VALUE = "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"
 
