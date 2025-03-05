@@ -10,8 +10,9 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from peft import PeftModel
 
-# === Environment Configuration ===
-#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+
 
 
 # === Model Configuration ===
