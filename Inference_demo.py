@@ -3,8 +3,8 @@ import time
 
 
 # Configuration
-PREDICTION_API_URL = "http://35.223.133.154:5000/prediction_API"
-RESULTS_API_URL = "http://35.223.133.154:5000/prediction_results/"
+PREDICTION_API_URL = "http://34.100.239.84:5000/prediction_API"
+RESULTS_API_URL = "http://34.100.239.84:5000/prediction_results/"
 ACCESS_TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MTc2ZWE1Zi02Y2E3LTQyYTQtYjgyZS1iZDIzYjE2M2I0MmUiLCJleHAiOjE4OTgxNTY2NDd9.bsSt-zFF4cwpBlK4eVj-dCZ2UyxSqsX-B1xBhCYLbOs"
 
 HEADERS = {
@@ -14,7 +14,7 @@ HEADERS = {
 
 # Data for prediction
 data = {
-    "workflowId": "d36c48eb-c542-44d1-b611-e041747c7de9",
+    "workflowId": "69419ed9-b00a-4e12-8e51-b8b89992ac7b",
     "data": {
         "id_1": "Explain Spiral model ?"
     }
@@ -61,4 +61,3 @@ if __name__ == "__main__":
     task_id = make_prediction()
     print("Task ID:", task_id)
     track_results(task_id)
-
