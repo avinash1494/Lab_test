@@ -161,3 +161,34 @@ def download_and_extract_zip(workflow_id, destination_folder):
     except Exception as e:
         print(f"❌ Error in download_and_extract_zip: {e}")
         return None
+
+
+def is_finetuning_completed(workflow_id):
+    """
+    Check if the fine-tuning process is completed for a given workflowId.
+    
+    :param workflow_id: The workflowId to check.
+    :return: Boolean indicating whether fine-tuning is completed.
+    """
+    db = client['dn-rag-db']
+    collection = db["workflows"]
+    
+    workflow_data = collection.find_one({"workflowId": workflow_id})
+    if not workflow_data:
+        return False  # Workflow ID not found
+    
+    fine_tune_configs = workflow_data.get("dsInfo", {}).get("fineTuneConfigs", {})
+    return fine_tune_configs.get("isFineTuningCompleted", False)
+
+
+
+@app.route("/finetuned_model_inference",methods=["POST"])
+def finetuned_model_inference():
+    content=request.json
+    workflow_id=content['workflowId']
+    modelType=content["modelType"]
+    data = content['data']
+    r=simple_app.send_task('tasks.finetuned_model_infernce_api',kwargs={"workflow_id":workflow_id,"modelType":modelType,"data":data})
+    app.logger.info(r.backend)
+    return r.id
+    
