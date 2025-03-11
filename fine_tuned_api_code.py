@@ -1,4 +1,3 @@
-
 @celery.task()
 def finetuned_model_infernce_api(workflow_id,modelType,data):
     print("fientuned model inference APi called",workflow_id,modelType,data)
@@ -20,6 +19,8 @@ def finetuned_model_infernce_api(workflow_id,modelType,data):
         is_finetuned=is_finetuning_completed(workflow_id)
         print("is finetuned mode is avaialble ?:",is_finetuned)
         if modelType=="finetuned_model":
+                unload_model()
+                unload_mistral_model()
                 if is_finetuned:
                     pass
                     if llm_model_to_use=="llama":
@@ -113,11 +114,21 @@ def finetuned_model_infernce_api(workflow_id,modelType,data):
                             "tokens_per_second": tokens_per_second,
                         }
                         final_result.append(cals)
-                    return final_result
+                    del llm,llm_chain,model,tokenizer,hf_pipeline
+                    final_response_to_send={
+                        "predicted_results":final_result,
+                        "result":"prediction success",
+                        "state":"SUCCESS",
+                        "message":"prediction success"
+                    }
+                    print("final_result:",final_response_to_send)
+                    return final_response_to_send
                 else:
                     print("fientuend model is not avaialble !!!")
         else:
             print("Need to infer the Base mdodel")
+        
+    
         
 
 import os
@@ -182,13 +193,26 @@ def is_finetuning_completed(workflow_id):
 
 
 
-@app.route("/finetuned_model_inference",methods=["POST"])
-def finetuned_model_inference():
-    content=request.json
-    workflow_id=content['workflowId']
-    modelType=content["modelType"]
-    data = content['data']
-    r=simple_app.send_task('tasks.finetuned_model_infernce_api',kwargs={"workflow_id":workflow_id,"modelType":modelType,"data":data})
+@app.route("/inference_for_finetuned_model",methods=["POST"])
+#@prediction_token_required
+def inference_for_finetuned_model():
+    original_token = request.headers.get('x-access-token')  # Safer way to access headers
+    content = request.json  # Remove duplicate assignment
+    workflow_id = content.get('workflowId')
+    modelType = content.get("modelType")
+    data = content.get('data')
+
+    if not workflow_id or not modelType or not data:
+        return {"error": "Missing required fields"}, 400
+
+    print("Got the request!")
+    print("WorkflowID:", workflow_id)
+    print("ModelType:", modelType)
+    print("Data:", data)
+
+    # Corrected task name
+    r = simple_app.send_task('tasks.finetuned_model_infernce_api', 
+                             kwargs={"workflow_id": workflow_id, "modelType": modelType, "data": data})
+
     app.logger.info(r.backend)
-    return r.id
-    
+    return {"task_id": r.id}, 200    
