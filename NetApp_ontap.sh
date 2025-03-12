@@ -85,3 +85,15 @@ br38916        ssh         password      admin            no     none
 fas9000-60-53-55::>
 
 Y~r9jW!n5SAZJ*
+
+
+gcloud alpha netapp volumes create {new_volume_name} "
+        f"--project={PROJECT} "
+        f"--location={LOCATION} "
+        f"--storage-pool={STORAGE_POOL} "
+        f"--capacity=3 "
+        f"--protocols={PROTOCOLS} "
+        f"--source-snapshot=projects/{PROJECT}/locations/{LOCATION}/volumes/{prev_volume_name}/snapshots/{snapshot_name} "
+        f"--share-name={share_name} "
+        f"--export-policy=allowed-clients={ALLOWED_CLIENTS},nfsv3=True,access-type=READ_WRITE"
+    )
