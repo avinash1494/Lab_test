@@ -16,3 +16,7 @@ docker run -d -p 6333:6333 -p 6334:6334 \
     --ulimit nofile=10000:10000 \
     -v $(pwd)/qdrant_storage:/qdrant/storage:z \
     qdrant/qdrant
+
+#########
+email: netapptest@netapp.com
+password: Abc@123
