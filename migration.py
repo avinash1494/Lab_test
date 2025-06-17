@@ -123,7 +123,7 @@ def create_snapshot(workflow_id,stage_info):
         error_msg={"task":"create_snapshot_after_rag","error":e,"traceback": traceback.format_exc()}
         print("error:",error_msg)
         return {"status":False,"msg":error_msg}
-create_snapshot("testing-snapshot-001","upload")
+#create_snapshot("testing-snapshot-001","upload")
 
 def list_snapshots(workflowId):
     try:
@@ -157,7 +157,7 @@ def list_snapshots(workflowId):
        "Content-Type": "application/json",
        "Accept": "application/json",
         }
-        data = {"volume":VolumeName}
+        data = {}
         try:
             response = requests.get(
                 api_url,
@@ -177,7 +177,7 @@ def list_snapshots(workflowId):
         error_msg={"task":"list_snapshots","error":e,"traceback": traceback.format_exc()}
         print("error:",error_msg)
         return {"status":False,"msg":error_msg}
-
+list_snapshots("test")
     
 
 def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_name, snapshot_name, share_name):
