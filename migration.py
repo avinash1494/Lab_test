@@ -298,4 +298,4 @@ def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_nam
         print("error:",error_msg)
         return {"status":False,"msg":error_msg}
         
-create_clone_from_existing_snapshot("test","volume_netapp_flex_1tb_root","volume_netapp_flex_avinash_vol", "nptesting-snapshot-001-upload", "")
+create_clone_from_existing_snapshot("test","volume_netapp_flex_1tb_root","volume_netapp_flex_avinash_vol1", "nptesting-snapshot-001-upload", "")
