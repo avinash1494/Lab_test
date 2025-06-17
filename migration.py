@@ -215,6 +215,11 @@ def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_nam
                     "name":"rag-pdfs-policy",
                 }
             },
+            "aggregates": [
+                {
+                    "name": "aggr1"
+                }
+            ],
             "comment": "Cloned volume for testing",
             "type": "rw"
         }
