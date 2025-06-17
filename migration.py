@@ -210,11 +210,6 @@ def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_nam
                 "uid": 0,
                 "gid": 0
             },
-            "qos": {
-                "policy": {
-                    "name":"rag-pdfs-policy",
-                }
-            },
             "aggregates": [
                 {
                     "name": "aggr1"
