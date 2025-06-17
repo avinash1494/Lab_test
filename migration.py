@@ -55,7 +55,7 @@ def create_snapshot_after_rag(workflow_id):
                 auth=(username, password),
                 headers=headers,
                 data=json.dumps(data),
-                verify=True
+                verify=False
             )
             response.raise_for_status()
             snapshot_data = response.json()
