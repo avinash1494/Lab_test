@@ -289,7 +289,7 @@ def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_nam
             else:
                 records=[]
             #os.mkdir(f"/volume_netapp_flex_1tb/{new_volume_name}")
-            os.system(f"kubectl -n staging exec deploy/rag-celery -c volume-mounter -- mkdir -p /volume_netapp_flex_1tb/{new_volume_name}")
+            os.system(f" sudo kubectl -n staging exec deploy/rag-celery -c volume-mounter -- mkdir -p /volume_netapp_flex_1tb/{new_volume_name}")
         except requests.exceptions.RequestException as e:
             print(f"Error while getting Volume UUID: {e}")
             return {"status":False,"msg":e}
@@ -298,4 +298,4 @@ def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_nam
         print("error:",error_msg)
         return {"status":False,"msg":error_msg}
         
-create_clone_from_existing_snapshot("test","volume_netapp_flex_1tb_root","volume_netapp_flex_avinash_vol1", "nptesting-snapshot-001-upload", "")
+create_clone_from_existing_snapshot("test","volume_netapp_flex_1tb_root","volume_netapp_flex_avinash_vol2", "nptesting-snapshot-001-upload", "")
