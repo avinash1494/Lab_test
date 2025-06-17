@@ -48,7 +48,7 @@ def create_snapshot_after_rag(workflow_id):
        "Content-Type": "application/json",
        "Accept": "application/json",
         }
-        data = {"snapshot": snapshot_name}
+        data = {"name": snapshot_name}
         try:
             response = requests.post(
                 api_url,
