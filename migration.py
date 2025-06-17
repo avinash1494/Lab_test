@@ -20,7 +20,7 @@ def create_snapshot_after_rag(workflow_id):
         username = USERNAME
         password = PASSWORD
         print("calling API to get the NetAPP volume UUID !!!")
-        url = f"https://{API_HOST}/api/storage/volumes?name={VolumeName}"
+        url = f"http://{API_HOST}/api/storage/volumes?name={VolumeName}"
         try:
             response = requests.get(
             url,
@@ -42,7 +42,7 @@ def create_snapshot_after_rag(workflow_id):
             return {"status":False,"msg":"NO volume Found !!!"}
         
         print("calling API to create Snapshot!!!",volume_uuid)
-        api_url =f"https://{API_HOST}/api/storage/volumes/{volume_uuid}/snapshots"
+        api_url =f"http://{API_HOST}/api/storage/volumes/{volume_uuid}/snapshots"
         headers = {
        "Content-Type": "application/json",
        "Accept": "application/json",
