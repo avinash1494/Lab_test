@@ -57,6 +57,7 @@ def create_snapshot_after_rag(workflow_id):
                 data=json.dumps(data),
                 verify=False
             )
+            print("60 lines:",response)
             response.raise_for_status()
             snapshot_data = response.json()
             print("snapshot data:",snapshot_data)
