@@ -5,7 +5,7 @@ import json
 from requests.auth import HTTPBasicAuth
 
 volumeDetails={}
-volumeDetails["volumeName"]=""
+volumeDetails["volumeName"]="volume_netapp_flex_1tb_root"
 API_HOST="10.0.2.27"
 USERNAME="fsxadmin"
 PASSWORD="&N5dJ)WY4Xm4UqqV"
@@ -67,7 +67,7 @@ def create_snapshot_after_rag(workflow_id):
         error_msg={"task":"create_snapshot_after_rag","error":e,"traceback": traceback.format_exc()}
         print("error:",error_msg)
         return {"status":False,"msg":e}
-
+create_snapshot_after_rag("test")
 #@celery.task()
 def create_snapshot(workflow_id,stage_info):
     try:
