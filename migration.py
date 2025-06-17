@@ -16,7 +16,7 @@ def create_snapshot_after_rag(workflow_id):
     try:
         VolumeName=volumeDetails["volumeName"]
         stage_info="vectorstore"
-        workflow_id=workflow_id.replace("-","_")
+        #workflow_id=workflow_id.replace("-","_")
         snapshot_name = f"np{workflow_id}_{stage_info}"
         username = USERNAME
         password = PASSWORD
@@ -69,7 +69,7 @@ def create_snapshot_after_rag(workflow_id):
         error_msg={"task":"create_snapshot_after_rag","error":e,"traceback": traceback.format_exc()}
         print("error:",error_msg)
         return {"status":False,"msg":e}
-create_snapshot_after_rag("test")
+create_snapshot_after_rag("test1")
 #@celery.task()
 def create_snapshot(workflow_id,stage_info):
     try:
