@@ -176,7 +176,7 @@ def list_snapshots(workflowId):
         error_msg={"task":"list_snapshots","error":e,"traceback": traceback.format_exc()}
         print("error:",error_msg)
         return {"status":False,"msg":error_msg}
-list_snapshots("test")
+#list_snapshots("test")
     
 
 def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_name, snapshot_name, share_name):
@@ -189,13 +189,42 @@ def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_nam
        "Content-Type": "application/json",
        "Accept": "application/json",
         }
-        data = {"volume":new_volume_name,
-                "parent-volume":parent_volume,
-                "parent-vserver":"ragsvm",
-                "parent-snapshot":snapshot_name,
-                "junction-path":f"/volume_netapp_flex_1tb/{new_volume_name}",
-                "qos-policy-group-name":"rag-pdfs-policy",
-                "vserver":"ragsvm"}
+        data={
+            "name": new_volume_name,
+            "svm": {
+                "name": "ragsvm"
+            },
+            "clone": {
+                "parent_volume": {
+                    "name": parent_volume
+                },
+                "parent_snapshot": {
+                    "name": snapshot_name
+                },
+                "parent_svm": {
+                    "name": "ragsvm"
+                }
+            },
+            "nas": {
+                "path":f"/volume_netapp_flex_1tb/{new_volume_name}",
+                "uid": 0,
+                "gid": 0
+            },
+            "qos": {
+                "policy": {
+                    "name":"rag-pdfs-policy",
+                }
+            },
+            "comment": "Cloned volume for testing",
+            "type": "rw"
+        }
+        # data = {"volume":new_volume_name,
+        #         "parent-volume":parent_volume,
+        #         "parent-vserver":"ragsvm",
+        #         "parent-snapshot":snapshot_name,
+        #         "junction-path":f"/volume_netapp_flex_1tb/{new_volume_name}",
+        #         "qos-policy-group-name":"rag-pdfs-policy",
+        #         "vserver":"ragsvm"}
         try:
             response = requests.post(
                 api_url,
@@ -204,9 +233,9 @@ def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_nam
                 data=json.dumps(data),
                 verify=False
             )
-            response.raise_for_status()
             snapshot_data = response.json()
             print("snapshot_data:",snapshot_data)
+            response.raise_for_status()
             return {"status":True,"msg":f"Snapshot list retrieved successfully :\n'{snapshot_data}'"}
         except requests.exceptions.RequestException as e:
             print(f"Error creating snapshot: {e}")
@@ -215,4 +244,5 @@ def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_nam
         error_msg={"task":"list_snapshots","error":e,"traceback": traceback.format_exc()}
         print("error:",error_msg)
         return {"status":False,"msg":error_msg}
-
+        
+create_clone_from_existing_snapshot("test","volume_netapp_flex_1tb_root","avinash_volume", "nptesting-snapshot-001-upload", "")
