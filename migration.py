@@ -69,7 +69,7 @@ def create_snapshot_after_rag(workflow_id):
         error_msg={"task":"create_snapshot_after_rag","error":e,"traceback": traceback.format_exc()}
         print("error:",error_msg)
         return {"status":False,"msg":e}
-create_snapshot_after_rag("test1")
+create_snapshot_after_rag("test1-23w2-1232")
 #@celery.task()
 def create_snapshot(workflow_id,stage_info):
     try:
