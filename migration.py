@@ -166,9 +166,9 @@ def list_snapshots(workflowId):
                 data=json.dumps(data),
                 verify=False
             )
-            response.raise_for_status()
             snapshot_data = response.json()
-            print("snapshot_data:",snapshot_data)
+            print("snapshot data:",snapshot_data)
+            response.raise_for_status()
             return {"status":True,"msg":f"Snapshot list retrieved successfully :\n'{snapshot_data}'"}
         except requests.exceptions.RequestException as e:
             print(f"Error creating snapshot: {e}")
