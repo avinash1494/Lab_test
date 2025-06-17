@@ -66,7 +66,7 @@ def create_snapshot_after_rag(workflow_id):
     except Exception as e:
         error_msg={"task":"create_snapshot_after_rag","error":e,"traceback": traceback.format_exc()}
         print("error:",error_msg)
-        return {"status":False,"msg":}
+        return {"status":False,"msg":e}
 
 #@celery.task()
 def create_snapshot(workflow_id,stage_info):
