@@ -288,7 +288,7 @@ def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_nam
                 print("records:",records)
             else:
                 records=[]
-        os.mkdir(f"/volume_netapp_flex_1tb/{new_volume_name}")
+            os.mkdir(f"/volume_netapp_flex_1tb/{new_volume_name}")
         except requests.exceptions.RequestException as e:
             print(f"Error while getting Volume UUID: {e}")
             return {"status":False,"msg":e}
