@@ -16,6 +16,7 @@ def create_snapshot_after_rag(workflow_id):
     try:
         VolumeName=volumeDetails["volumeName"]
         stage_info="vectorstore"
+        workflow_id=workflow_id.replace("-",_")
         snapshot_name = f"np{workflow_id}_{stage_info}"
         username = USERNAME
         password = PASSWORD
