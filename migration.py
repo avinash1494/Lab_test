@@ -2,6 +2,7 @@ import requests
 import traceback
 import urllib3
 import json
+import os
 from requests.auth import HTTPBasicAuth
 
 volumeDetails={}
@@ -240,9 +241,60 @@ def create_clone_from_existing_snapshot(workflow_id,parent_volume,new_volume_nam
         except requests.exceptions.RequestException as e:
             print(f"Error creating snapshot: {e}")
             return {"status":False,"msg":e}
+        print("calling API to reterive the Volume UUID")
+        url = f"https://{API_HOST}/api/storage/volumes?name={new_volume_name}"
+        try:
+            response = requests.get(
+            url,
+            auth=HTTPBasicAuth(username, password),
+            verify=False
+            )
+            if response.status_code == 200:
+                result = response.json()
+                records = result.get("records", [])
+                print("records:",records)
+            else:
+                records=[]
+        except requests.exceptions.RequestException as e:
+            print(f"Error while getting Volume UUID: {e}")
+            return {"status":False,"msg":e}
+        if len(records)>0:
+            volume_uuid=records[0]["uuid"]
+        else:
+            return {"status":False,"msg":"NO volume Found !!!"}
+        print("Found the new volume UUId:",volume_uuid)
+        print("calling API to Modify the policy!!!!!")
+        api_url =f"https://{API_HOST}/api/storage/volumes/{volume_uuid}"
+        headers = {
+       "Content-Type": "application/json",
+       "Accept": "application/json",
+        }
+        data = {
+          "nas": {
+            "export_policy": {
+              "name": "rag-pdfs-policy"
+            }
+          }
+        }
+        try:
+            response = requests.put(
+            api_url,
+            auth=HTTPBasicAuth(username, password),
+            verify=False
+            )
+            if response.status_code == 200:
+                result = response.json()
+                records = result.get("records", [])
+                print("records:",records)
+            else:
+                records=[]
+        os.mkdir(f"/volume_netapp_flex_1tb/{new_volume_name}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error while getting Volume UUID: {e}")
+            return {"status":False,"msg":e}
     except Exception as e:
         error_msg={"task":"list_snapshots","error":e,"traceback": traceback.format_exc()}
         print("error:",error_msg)
         return {"status":False,"msg":error_msg}
         
-create_clone_from_existing_snapshot("test","volume_netapp_flex_1tb_root","avinash_volume", "nptesting-snapshot-001-upload", "")
+create_clone_from_existing_snapshot("test","volume_netapp_flex_1tb_root","volume_netapp_flex_avinash_vol", "nptesting-snapshot-001-upload", "")
