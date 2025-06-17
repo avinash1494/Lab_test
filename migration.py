@@ -58,7 +58,8 @@ def create_snapshot_after_rag(workflow_id):
                 verify=False
             )
             response.raise_for_status()
-            snapshot_data = response.json()
+            snapshot_data = response.json()'
+            print("snapshot data:",snapshot_data)
             print(f"Snapshot '{snapshot_name}' created successfully. Snapshot UUID: {snapshot_data['uuid']}")
             return {"status":True,"msg":f"Snapshot '{snapshot_name}' created successfully. Snapshot UUID: {snapshot_data['uuid']}"}
         except requests.exceptions.RequestException as e:
