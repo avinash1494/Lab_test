@@ -16,7 +16,7 @@ def create_snapshot_after_rag(workflow_id):
     try:
         VolumeName=volumeDetails["volumeName"]
         stage_info="vectorstore"
-        snapshot_name = f"np{workflow_id}-{stage_info}"
+        snapshot_name = f"np{workflow_id}_{stage_info}"
         username = USERNAME
         password = PASSWORD
         print("calling API to get the NetAPP volume UUID !!!")
