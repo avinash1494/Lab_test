@@ -163,7 +163,6 @@ def list_snapshots(workflowId):
                 api_url,
                 auth=(username, password),
                 headers=headers,
-                data=json.dumps(data),
                 verify=False
             )
             snapshot_data = response.json()
