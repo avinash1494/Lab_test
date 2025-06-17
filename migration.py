@@ -114,8 +114,8 @@ def create_snapshot(workflow_id,stage_info):
             )
             response.raise_for_status()
             snapshot_data = response.json()
-            print(f"Snapshot '{snapshot_name}' created successfully. Snapshot UUID: {snapshot_data['uuid']}")
-            return {"status":True,"msg":f"Snapshot '{snapshot_name}' created successfully. Snapshot UUID: {snapshot_data['uuid']}"}
+            print(f"Snapshot '{snapshot_name}' created successfully.")
+            return {"status":True,"msg":f"Snapshot '{snapshot_name}' created successfully."}
         except requests.exceptions.RequestException as e:
             print(f"Error creating snapshot: {e}")
             return {"status":False,"msg":e}
