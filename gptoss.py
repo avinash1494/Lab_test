@@ -17,7 +17,7 @@ model = AutoModelForCausalLM.from_pretrained(
 print("Model loaded!")
 
 messages = [
-    {"role": "user", "content": "In my hostel, light is not working"}
+    {"role": "user", "content": "Explain Spiral model"}
 ]
 
 print("Tokenizing...")
