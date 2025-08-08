@@ -31,7 +31,7 @@ inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
 print("Generating output...")
 
 # Step 3: Generate output
-outputs = model.generate(**inputs, max_new_tokens=40)
+outputs = model.generate(**inputs, max_new_tokens=200)
 
 # Step 4: Decode
 response = tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
