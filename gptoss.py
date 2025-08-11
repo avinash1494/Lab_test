@@ -11,15 +11,11 @@ model = AutoModelForCausalLM.from_pretrained(
 
 print("Model loaded!")
 
-question = "Explain Spiral model"
+# Your dynamic question
+question = "Explain Spiral model"  # Change to anything
 
-# Clean, strict instruction
-prompt = f"""Answer the question below in clear, complete sentences.
-Do not include reasoning steps, meta-commentary, or notes about the question.
-Provide a direct, well-structured explanation.
-
-Question: {question}
-"""
+# Generic, reusable instruction
+prompt = f"Provide a clear, complete, and well-structured answer to the following question without showing reasoning steps or meta-commentary:\n\n{question}"
 
 # Tokenize
 inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
@@ -28,7 +24,7 @@ print("Generating output...")
 
 outputs = model.generate(
     **inputs,
-    max_new_tokens=300,  # More room for detailed explanation
+    max_new_tokens=300,
     pad_token_id=tokenizer.eos_token_id,
     eos_token_id=tokenizer.eos_token_id
 )
@@ -39,4 +35,11 @@ response = tokenizer.decode(
     skip_special_tokens=True
 ).strip()
 
-print("Output:\n", response)
+# Optional: remove common meta-text leaks
+meta_prefixes = ("the chatgpt prompt", "we must respond", "likely about", "the user")
+cleaned = "\n".join(
+    line for line in response.split("\n") 
+    if not line.strip().lower().startswith(meta_prefixes)
+)
+
+print("Output:\n", cleaned)
