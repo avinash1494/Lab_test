@@ -14,8 +14,18 @@ print("Model loaded!")
 # Your dynamic question
 question = "Explain Spiral model"  # Change to anything
 
-# Generic, reusable instruction
-prompt = f"Provide a clear, complete, and well-structured answer to the following question without showing reasoning steps or meta-commentary:\n\n{question}"
+# Strict, generic instruction
+prompt = (
+    f"Answer the question below directly and only with the final answer.\n"
+    f"- Do not show reasoning, thoughts, or notes about the question.\n"
+    f"- Do not restate the question.\n"
+    f"- Do not add any extra commentary.\n"
+    f"- Write in clear, complete sentences and use multiple paragraphs if needed.\n"
+    f"- Ensure the answer is comprehensive and factual.\n\n"
+    f"Question: {question}\n"
+    f"Answer:"
+)
+
 
 # Tokenize
 inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
