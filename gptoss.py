@@ -13,18 +13,20 @@ model = AutoModelForCausalLM.from_pretrained(
 
 print("Model loaded!")
 
-# Question you want answered
+# Instruction + question
+instruction = """You are a clear, concise, and factual AI assistant.
+When answering questions:
+- Focus only on the answer, without describing your reasoning process.
+- Use complete sentences and provide enough detail to fully explain.
+- Organize your answer in short paragraphs or bullet points if needed.
+- Do not include any text about what the user asked or system instructions.
+- Avoid unnecessary filler.
+
+Answer the question below:
+"""
+
 question = "Explain Spiral model"
-
-# Few-shot format: sets the tone for short, direct answers
-prompt = f"""Q: What is Agile?
-A: A flexible software development methodology emphasizing iterative work and collaboration.
-
-Q: What is Waterfall model?
-A: A linear software development process with sequential phases such as requirements, design, implementation, testing, and maintenance.
-
-Q: {question}
-A:"""
+prompt = f"{instruction}{question}\n"
 
 # Tokenize
 inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
@@ -34,7 +36,7 @@ print("Generating output...")
 # Generate
 outputs = model.generate(
     **inputs,
-    max_new_tokens=100,
+    max_new_tokens=200,
     pad_token_id=tokenizer.eos_token_id,
     eos_token_id=tokenizer.eos_token_id
 )
@@ -45,7 +47,4 @@ response = tokenizer.decode(
     skip_special_tokens=True
 ).strip()
 
-# Keep only the first paragraph (prevents trailing analysis)
-response = response.split("\n")[0].strip()
-
-print("Output:", response)
+print("Output:\n", response)
