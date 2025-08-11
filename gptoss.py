@@ -2,6 +2,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 model_name = "openai/gpt-oss-20b"
 
+# Load tokenizer & model
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
@@ -11,21 +12,25 @@ model = AutoModelForCausalLM.from_pretrained(
 
 print("Model loaded!")
 
-# Your dynamic question
-question = "Explain Spiral model"  # Change to anything
+question = "Explain Spiral model"  # You can change this to anything
 
-# Strict, generic instruction
-prompt = (
-    f"Answer the question below directly and only with the final answer.\n"
-    f"- Do not show reasoning, thoughts, or notes about the question.\n"
-    f"- Do not restate the question.\n"
-    f"- Do not add any extra commentary.\n"
-    f"- Write in clear, complete sentences and use multiple paragraphs if needed.\n"
-    f"- Ensure the answer is comprehensive and factual.\n\n"
-    f"Question: {question}\n"
-    f"Answer:"
-)
+# Chat messages list
+messages = [
+    {
+        "role": "system",
+        "content": (
+            "You are a helpful assistant. "
+            "Always respond with only the final answer to the user’s question. "
+            "Do not include reasoning steps, meta-commentary, or restate the question. "
+            "Write in clear, complete sentences, and use multiple paragraphs if needed. "
+            "Ensure the answer is comprehensive and factual."
+        )
+    },
+    {"role": "user", "content": question}
+]
 
+# Apply the chat template
+prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
 # Tokenize
 inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
@@ -45,11 +50,4 @@ response = tokenizer.decode(
     skip_special_tokens=True
 ).strip()
 
-# Optional: remove common meta-text leaks
-meta_prefixes = ("the chatgpt prompt", "we must respond", "likely about", "the user")
-cleaned = "\n".join(
-    line for line in response.split("\n") 
-    if not line.strip().lower().startswith(meta_prefixes)
-)
-
-print("Output:\n", cleaned)
+print("Output:\n", response)
