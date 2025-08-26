@@ -9,7 +9,6 @@ model = AutoModelForCausalLM.from_pretrained(
     torch_dtype="auto",
     device_map="device_map
 )
-
 print("Model loaded!")
 messages = [
     {"role": "user", "content": "Explain Spiral model"}
