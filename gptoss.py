@@ -1,13 +1,15 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import torch
-
+device_map = {0: "cuda:0", 1: "cuda:1", 2: "cuda:2"}
 # Load tokenizer and model
 model_name = "openai/gpt-oss-20b"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    device_map="auto",
-    trust_remote_code=True
+                model_name,
+                device_map=device_map,
+                torch_dtype=torch.float16,
+                load_in_4bit=True,
+                trust_remote_code=True
 )
 print("Model loaded!")
 messages = [
