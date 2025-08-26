@@ -7,7 +7,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
     torch_dtype="auto",
-    device_map = "sequential"
+    device_map = "balanced"
 )
 print("Model loaded!")
 messages = [
