@@ -5,9 +5,11 @@ device_map = {0: "cuda:0", 1: "cuda:1", 2: "cuda:2"}
 model_name = "openai/gpt-oss-20b"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                device_map=device_map
+    model_name,
+    torch_dtype="auto",
+    device_map="device_map
 )
+
 print("Model loaded!")
 messages = [
     {"role": "user", "content": "Explain Spiral model"}
