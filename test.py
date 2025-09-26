@@ -5,7 +5,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 
 # === Model Configuration ===
 BASE_MODEL = "meta-llama/Llama-3.2-3B"
-TOKEN_VALUE = "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"
+TOKEN_VALUE = "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"
 
 CACHE_DIR = "/home/models/"
 
