@@ -7,8 +7,10 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 BASE_MODEL = "meta-llama/Llama-3.2-3B"
 TOKEN_VALUE = "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"
 
+CACHE_DIR = "/home/models/"
+
 # === Load Tokenizer ===
-tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, token=TOKEN_VALUE)
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, token=TOKEN_VALUE,cache_dir=CACHE_DIR)
 
 # === Configure BitsAndBytes for Quantization ===
 bnb_config = BitsAndBytesConfig(
@@ -23,7 +25,8 @@ model = AutoModelForCausalLM.from_pretrained(
     BASE_MODEL,
     token=TOKEN_VALUE,
     torch_dtype=torch.float16,
-    device_map="auto"
+    device_map="auto",
+    cache_dir=CACHE_DIR
 )
 
 # === Set Padding ===
