@@ -13,7 +13,7 @@ import torch
 # CONFIG
 # ---------------------------
 
-HF_TOKEN = os.environ.get("HF_TOKEN", "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")
+HF_TOKEN = os.environ.get("HF_TOKEN", "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")
 login(token=HF_TOKEN)
 os.environ["HUGGINGFACE_HUB_TOKEN"] = HF_TOKEN
 
@@ -39,23 +39,32 @@ def create_db_from_csv_files(csv_files, db_file):
 # ---------------------------
 # LOAD MISTRAL 7B MODEL (CUDA)
 # ---------------------------
-def load_mistral_model():
-    tokenizer = AutoTokenizer.from_pretrained(
-        "mistralai/Mistral-7B-Instruct-v0.3"
-    )
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from langchain_community.llms import HuggingFacePipeline
 
+def load_mistral_model():
+    # Detect CUDA availability
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"CUDA Available: {torch.cuda.is_available()}, loading model on {device.upper()}")
+
+    # Load tokenizer
+    tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.3")
+
+    # Load model with appropriate device
     model = AutoModelForCausalLM.from_pretrained(
         "mistralai/Mistral-7B-Instruct-v0.3",
         trust_remote_code=True,
-        device_map="auto",  # Automatically load to available CUDA device
-        torch_dtype=torch.float16  # Use FP16 for faster inference on NVIDIA GPUs
+        device_map="auto" if device == "cuda" else None,
+        torch_dtype=torch.float16 if device == "cuda" else torch.float32
     )
 
+    # Create text-generation pipeline
     text_gen_pipeline = pipeline(
         task="text-generation",
         model=model,
         tokenizer=tokenizer,
-        device=0,  # Use CUDA device 0
+        device=0 if device == "cuda" else -1,  # -1 for CPU, 0 for first GPU
         temperature=0.1,
         repetition_penalty=1.1,
         return_full_text=True
@@ -63,6 +72,7 @@ def load_mistral_model():
 
     llm_pipeline = HuggingFacePipeline(pipeline=text_gen_pipeline)
     return llm_pipeline
+
 
 # ---------------------------
 # RUN QUESTIONS THROUGH SQL + LLM CHAIN
