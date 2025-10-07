@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "upheld-arena-434705-a4",
+  "private_key_id": "7dc306c42cd52e3399afb77d568472fb910dc6ca",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCfNI9XKBAvBKCb\n8b7m7uKAPavUd6krJgLUBFKHaA5TtrVw/zXL0TCqFiDpvbBUx9aqrfeVKwZcJ6co\nIpyZGXEbfSYUubX57QJ5s8RhJUAqAr651oeR71Nrw9MIz+Tgnh5JL2wXMkq0m6VG\noIEPEaQ/HqgYHuLqgWlGV2Mux7ySujpvCRLqH4amn+5cGrL/bgn4vJ57d96WIp/g\nA/+IWquJTyanTI9Ssp3RdwhT+/a281xvB/XEfKAqcUnnXszz6bcsyoKHpBVEuI/3\nVcJhJZ59sjNqKunZPx+WuYtu4Aff5uLiurQseu/2z6H3UY+7uGm8EsSN9X1SCKMb\nzLGGbSJnAgMBAAECggEAEIOvu2889TD022hMEKwb/l3SAAP6SNm0YRDNDMhhoBPA\n+3vbCo2PD5L5uWADYAVWF7YHC3Kp7LpHmnVeACWa+CqBs5RWCPBUbue+XwNcW19A\nhd933aP758mpj5hHxM2yFOO17IFmLW5DH9yQtqLyV4J9wPlx5A3Q1p/u+mXJV6uO\npZH+QB7/BZdThdwDCs4GBYXNAEXKvLhS0gJe43epAIZnod76jhQ2bK/sWqhLaO2B\ni/t4196YyQsgZaqkNrvPc4tuOAu37zbjFDU8t1L4U90YPyP2qpyB436yv7Hpqb1S\n4q5QXeUwiNaPQXFtRSXgEjgoXXfUB99E0DVeQz5p6QKBgQDb938AeA3eMs6Yprda\nKCcveDD+9SxUAPlAPvKTItpZMEpOpHnLV9LrdIqVGIfFlnRkzZzWvgefDEp1WXk5\nr2zBK3ZoN5qRX+jZNRANOERXoD6CyzY+U2Cq/BAndOziS8tb1I85pjbxY8AWyKXz\nQVSgjhtBTLrXT2s43KdtX96HTwKBgQC5SPoqXbzCvxTUwC6MjrV3L47F3Pb043YS\n0JP3S4DebPMJ3xBICQ3iF0t+0KighWoH5h32PGJqKd9nL8vVtLFyuZ1kgsOHr+jj\npiMAzFST1hyXRmjRgoxwJeCK+w+VVUiCuxpi/+pEJsFJ2NFN6oI3mXg1lp2mOoZK\n9FH0MAVtaQKBgAo1yL1a1Tn1HcXUJzqWFouLhqqu8qnLicZDpbrSqVPue+R+mfCo\nWO/47t3Qz6yKOUjcimUlWPE2/tXHm2rkC6ZDwDFCM3h//Szn26Dhdbqjg4NKr2/h\nKuGE5bMPKFewsPXIPgWtA2vc93OXSKyr4aO6NOWpDBsmYpG3HEZlZszdAoGAC37N\nlodOSL7WKgTqXmoUNBrNPtVgtPzPvIcYRwV2L1aPFZOzTOTS6a4MTwffDmZ4l5jd\nTwOcD34dkCdU/CNDxxxg+XVrcCWny0fpcAk9ThbAm1oQ8r6ou+R9s+Gzq84ou4Ok\nNXQvMp886rn68lyUS6LH5Hs9uKx03H2gAAhirdECgYEAxiL6DovltlaFO203yi24\nOMGlTWb08To53UVsXLZG1Eh4FrCG+t7L4vXkaEuh6tB8+967abDcQlD6gpM3pbQK\nPiGv3uWBm/YyRic0gw88ujXWwccZkFC0zV4cn1OE8EsmCfY5qMkBwzFWG26Xh9u0\nny9g7RDYqfnfB4LZz3gZot0=\n-----END PRIVATE KEY-----\n",
+  "client_email": "pubsub-listener@upheld-arena-434705-a4.iam.gserviceaccount.com",
+  "client_id": "113849489423929924776",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/pubsub-listener%40upheld-arena-434705-a4.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
